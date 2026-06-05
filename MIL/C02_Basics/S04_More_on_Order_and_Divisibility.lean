@@ -39,13 +39,81 @@ example : min a b = min b a := by
     apply min_le_left
 
 example : max a b = max b a := by
-  sorry
+  --sorry
+  apply le_antisymm
+  · show max a b ≤ max b a
+    apply max_le
+    · apply le_max_right
+    apply le_max_left
+  · show max b a ≤ max a b
+    apply max_le
+    · apply le_max_right
+    apply le_max_left
+
 example : min (min a b) c = min a (min b c) := by
-  sorry
+  --sorry
+  apply le_antisymm
+  · show min (min a b) c ≤ min a (min b c)
+    apply le_min
+    · show min (min a b) c ≤ a
+      rw [min_le_iff]
+      left
+      exact min_le_left a b
+    · show min (min a b) c ≤ min b c
+      apply le_min
+      · show min (min a b) c ≤ b
+        rw [min_le_iff]
+        left
+        exact min_le_right a b
+      · show min (min a b) c ≤ c
+        rw [min_le_iff]
+        right
+        linarith
+  · show min a (min b c) ≤ min (min a b) c
+    apply le_min
+    · show min a (min b c) ≤ min a b
+      apply le_min
+      · show min a (min b c) ≤ a
+        apply min_le_left
+      · show min a (min b c) ≤ b
+        rw [min_le_iff]
+        right
+        apply min_le_left
+    · show min a (min b c) ≤ c
+      rw [min_le_iff]
+      right
+      apply min_le_right
+
+example : min (min a b) c = min a (min b c) := by
+  exact min_assoc a b c
+
 theorem aux : min a b + c ≤ min (a + c) (b + c) := by
-  sorry
+  --sorry
+  apply le_min
+  · apply add_le_add_left
+    apply min_le_left
+  · apply add_le_add_left
+    apply min_le_right
+
 example : min a b + c = min (a + c) (b + c) := by
-  sorry
+  --sorry
+  have h : min (a+c) (b+c) + -c ≤ min (a+c + -c) (b+c + -c) := by
+    exact aux (a+c) (b+c) (-c)
+  have h₁ : min (a+c) (b+c) + -c +c ≤ min (a+c + -c) (b+c + -c) +c := by
+    exact add_le_add_left h c
+  have h₂ : min (a+c) (b+c) + -c +c = min (a+c) (b+c) := by
+    rw [add_assoc, neg_add_cancel, add_zero]
+  have h₃ : min (a+c + -c) (b+c + -c) = min a b := by
+    rw [add_assoc, add_neg_cancel, add_zero]
+    rw [add_assoc, add_neg_cancel, add_zero]
+  have h₄ : min (a+c) (b+c) ≤ min a b + c := by
+    rw [← h₂, ← h₃]
+    exact h₁
+
+  apply le_antisymm
+  · apply aux
+  exact h₄
+
 #check (abs_add_le : ∀ a b : ℝ, |a + b| ≤ |a| + |b|)
 
 example : |a| - |b| ≤ |a - b| :=
@@ -80,5 +148,3 @@ variable (m n : ℕ)
 example : Nat.gcd m n = Nat.gcd n m := by
   sorry
 end
-
-
