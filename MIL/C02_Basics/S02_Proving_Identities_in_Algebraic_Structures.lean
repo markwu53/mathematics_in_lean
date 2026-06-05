@@ -70,20 +70,37 @@ theorem mul_zero (a : R) : a * 0 = 0 := by
   rw [add_left_cancel h]
 
 theorem zero_mul (a : R) : 0 * a = 0 := by
-  sorry
+  --sorry
+  have h : 0 * a + 0 * a = 0 * a + 0 := by
+    rw [← add_mul, add_zero, add_zero]
+  rw [add_left_cancel h]
 
 theorem neg_eq_of_add_eq_zero {a b : R} (h : a + b = 0) : -a = b := by
-  sorry
+  --sorry
+  have h1 : a + -a = a + b := by
+    rw [h, add_neg_cancel]
+  rw [add_left_cancel h1]
 
 theorem eq_neg_of_add_eq_zero {a b : R} (h : a + b = 0) : a = -b := by
-  sorry
+  --sorry
+  have h1 : -b + a + b = -b := by
+    rw [add_assoc, h, add_zero]
+  have h2 : a + -b + b = -b := by
+    rw [add_comm a, h1]
+  have h3 : a + 0 = -b := by
+    rw [← neg_add_cancel b, ← add_assoc, h2]
+  rw [← add_zero a, h3]
 
 theorem neg_zero : (-0 : R) = 0 := by
   apply neg_eq_of_add_eq_zero
   rw [add_zero]
 
 theorem neg_neg (a : R) : - -a = a := by
-  sorry
+  --sorry
+  have h : a = - -a := by
+    apply eq_neg_of_add_eq_zero
+    rw [add_comm, neg_add_cancel]
+  rw [← h]
 
 end MyRing
 
@@ -106,13 +123,15 @@ namespace MyRing
 variable {R : Type*} [Ring R]
 
 theorem self_sub (a : R) : a - a = 0 := by
-  sorry
+  --sorry
+  rw [sub_eq_add_neg, add_comm, neg_add_cancel]
 
 theorem one_add_one_eq_two : 1 + 1 = (2 : R) := by
   norm_num
 
 theorem two_mul (a : R) : 2 * a = a + a := by
-  sorry
+  --sorry
+  rw [← one_add_one_eq_two, add_mul, one_mul]
 
 end MyRing
 
@@ -135,13 +154,22 @@ variable {G : Type*} [Group G]
 namespace MyGroup
 
 theorem mul_inv_cancel (a : G) : a * a⁻¹ = 1 := by
-  sorry
+  --sorry
+  --this uses mul_one and mul_right_cancel which are not in the pool
+  have h : a * a⁻¹ * a = 1 * a := by
+    rw [mul_assoc, inv_mul_cancel, mul_one, one_mul]
+  exact mul_right_cancel h
 
 theorem mul_one (a : G) : a * 1 = a := by
-  sorry
+  --sorry
+  rw [← inv_mul_cancel a, ← mul_assoc, mul_inv_cancel, one_mul]
 
 theorem mul_inv_rev (a b : G) : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
-  sorry
+  --sorry
+  have h : (a * b)⁻¹ * (a * b) = b⁻¹ * a⁻¹ * (a * b) := by
+    rw [inv_mul_cancel (a * b), ← mul_assoc, mul_assoc (b⁻¹), inv_mul_cancel]
+    rw [mul_one, inv_mul_cancel]
+  exact mul_right_cancel h
 
 end MyGroup
 
