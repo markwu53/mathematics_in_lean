@@ -116,8 +116,15 @@ example : min a b + c = min (a + c) (b + c) := by
 
 #check (abs_add_le : ∀ a b : ℝ, |a + b| ≤ |a| + |b|)
 
-example : |a| - |b| ≤ |a - b| :=
-  sorry
+example : |a| - |b| ≤ |a - b| := by
+  --sorry
+  have h : |a - b + b| ≤ |a - b| + |b| := by
+    apply abs_add_le (a-b) b
+  have h₁ : |a| ≤ |a - b| + |b| := by
+    rw [sub_add_cancel a b] at h
+    exact h
+  linarith
+
 end
 
 section
@@ -134,7 +141,37 @@ example : x ∣ x ^ 2 := by
   apply dvd_mul_left
 
 example (h : x ∣ w) : x ∣ y * (x * z) + x ^ 2 + w ^ 2 := by
-  sorry
+  --sorry
+  have h₁ : x ∣ y * (x * z) := by
+    rw [← mul_assoc]
+    apply dvd_mul_of_dvd_left
+    apply dvd_mul_left
+  have h₂ : x ∣ x ^ 2 := by
+    apply dvd_mul_left
+  have h₃ : x ∣ w ^ 2 := by
+    rw [pow_two]
+    apply dvd_mul_of_dvd_left
+    exact h
+  apply dvd_add
+  · apply dvd_add
+    · exact h₁
+    exact h₂
+  exact h₃
+
+example (h : x ∣ w) : x ∣ y * (x * z) + x ^ 2 + w ^ 2 := by
+  --sorry
+  have h₁ : x ∣ y * (x * z) := by
+    rw [← mul_assoc]
+    apply dvd_mul_of_dvd_left
+    apply dvd_mul_left
+  have h₂ : x ∣ x ^ 2 := by
+    apply dvd_mul_left
+  have h₃ : x ∣ w ^ 2 := by
+    rw [pow_two]
+    apply dvd_mul_of_dvd_left
+    exact h
+  exact dvd_add (dvd_add h₁ h₂) h₃
+
 end
 
 section
